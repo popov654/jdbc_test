@@ -2,13 +2,12 @@ package jdbc.service;
 
 import jdbc.entity.Order;
 import jdbc.repository.OrderRepository;
-import jdbc.repository.exception.RepositoryErrorException;
+import jdbc.repository.exception.RepositoryAccessException;
 import jdbc.repository.exception.ResultNotFoundException;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -22,7 +21,7 @@ public class OrderService {
         this.repository = repository;
     }
     
-    public void seedData() throws RepositoryErrorException {
+    public void seedData() throws RepositoryAccessException {
         List<Order> orders = List.of(
                 new Order(1L, "Order 1", "Order description", LocalDate.of(2023, 7, 4), 2200),
                 new Order(2L, "Order 2", "Order description", LocalDate.of(2022, 10, 17),1760),
@@ -34,64 +33,57 @@ public class OrderService {
         try {
             this.repository.seedData(orders);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RepositoryErrorException("Repository access error");
+            throw new RepositoryAccessException(e);
         }
     }
 
-    public List<Order> getOrders() throws RepositoryErrorException {
+    public List<Order> getOrders() throws RepositoryAccessException {
         try {
             return repository.getAll();
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RepositoryErrorException("Repository access error");
+            throw new RepositoryAccessException(e);
         }
     }
 
-    public Order getOrder(long id) throws RepositoryErrorException, ResultNotFoundException {
+    public Order getOrder(long id) throws RepositoryAccessException, ResultNotFoundException {
         try {
             return repository.get(id);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RepositoryErrorException("Repository access error");
+            throw new RepositoryAccessException(e);
         }
     }
 
-    public Order createOrder(String name, String description, LocalDate deliveryDate, int price) throws RepositoryErrorException {
+    public Order createOrder(String name, String description, LocalDate deliveryDate, int price) throws RepositoryAccessException {
         Order order = new Order(0L, name, description, deliveryDate, price);
         try {
             repository.create(order);
             return order;
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RepositoryErrorException("Repository access error");
+            throw new RepositoryAccessException(e);
         }
     }
 
-    public void updateOrder(Order order) throws RepositoryErrorException {
+    public void updateOrder(Order order) throws RepositoryAccessException {
         try {
             repository.update(order);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RepositoryErrorException("Repository access error");
+            throw new RepositoryAccessException(e);
         }
     }
 
-    public void removeOrder(Order order) throws RepositoryErrorException {
+    public void removeOrder(Order order) throws RepositoryAccessException {
         try {
             repository.delete(order);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RepositoryErrorException("Repository access error");
+            throw new RepositoryAccessException(e);
         }
     }
 
-    public void removeOrder(long id) throws RepositoryErrorException {
+    public void removeOrder(long id) throws RepositoryAccessException {
         try {
             repository.delete(id);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RepositoryErrorException("Repository access error");
+            throw new RepositoryAccessException(e);
         }
     }
 

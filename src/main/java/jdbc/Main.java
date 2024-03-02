@@ -3,18 +3,13 @@ package jdbc;
 import jdbc.db.ConnectionManager;
 import jdbc.entity.Order;
 import jdbc.repository.OrderRepository;
-import jdbc.repository.exception.RepositoryErrorException;
+import jdbc.repository.exception.RepositoryAccessException;
 import jdbc.repository.exception.ResultNotFoundException;
 import jdbc.service.OrderService;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 import java.time.LocalDate;
 
 /**
@@ -39,7 +34,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             connectionManager = new ConnectionManager(DATA_SOURCE);
-            OrderService service = new OrderService(new OrderRepository(connectionManager.getConnection()));
+            OrderService service = new OrderService(new OrderRepository(connectionManager));
             service.seedData();
             printOrders(service.getOrders());
 
@@ -63,7 +58,7 @@ public class Main {
 
             System.out.println();
             printOrders(service.getOrders());
-        } catch (SQLException | RepositoryErrorException | ResultNotFoundException e) {
+        } catch (SQLException | RepositoryAccessException | ResultNotFoundException e) {
             e.printStackTrace();
         } finally {
             try {

@@ -1,6 +1,7 @@
 package jdbc.repository;
 
 
+import jdbc.db.ConnectionManager;
 import jdbc.entity.Order;
 import jdbc.repository.exception.ResultNotFoundException;
 
@@ -10,13 +11,14 @@ import java.util.List;
 
 public class OrderRepository {
 
-    private final Connection connection;
+    private final ConnectionManager connectionManager;
 
-    public OrderRepository(Connection connection) {
-        this.connection = connection;
+    public OrderRepository(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
 
     public List<Order> getAll() throws SQLException {
+        Connection connection = connectionManager.getConnection();
         List<Order> list = new ArrayList<>();
         Statement stmt = connection.createStatement();
         ResultSet result = stmt.executeQuery("SELECT * FROM orders ORDER BY id ASC");
@@ -32,6 +34,7 @@ public class OrderRepository {
     }
 
     public Order get(long id) throws SQLException, ResultNotFoundException {
+        Connection connection = connectionManager.getConnection();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM orders WHERE id=?");
         stmt.setLong(1, id);
         ResultSet result = stmt.executeQuery();
@@ -48,6 +51,7 @@ public class OrderRepository {
     }
 
     public void create(Order order) throws SQLException {
+        Connection connection = connectionManager.getConnection();
         PreparedStatement pstmt = connection.prepareStatement("INSERT INTO orders (`name`, `description`, `delivery_date`, `price`) VALUES(?, ?, ?, ?)");
         pstmt.setString(1, order.getName());
         pstmt.setString(2, order.getDescription());
@@ -63,6 +67,7 @@ public class OrderRepository {
     }
 
     public void update(Order order) throws SQLException {
+        Connection connection = connectionManager.getConnection();
         PreparedStatement pstmt = connection.prepareStatement("REPLACE INTO orders (`id`, `name`, `description`, `delivery_date`, `price`) VALUES(?, ?, ?, ?, ?)");
         pstmt.setLong(1, order.getId());
         pstmt.setString(2, order.getName());
@@ -77,12 +82,14 @@ public class OrderRepository {
     }
 
     public void delete(long id) throws SQLException {
+        Connection connection = connectionManager.getConnection();
         PreparedStatement pstmt = connection.prepareStatement("DELETE FROM `orders` WHERE `id`=?");
         pstmt.setLong(1, id);
         pstmt.execute();
     }
 
     public void seedData(List<Order> orders) throws SQLException {
+        Connection connection = connectionManager.getConnection();
         Statement stmt = connection.createStatement();
         stmt.execute("CREATE TABLE IF NOT EXISTS `orders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                 " `name` CHAR(120) NOT NULL," +
