@@ -70,12 +70,6 @@ public class OrderRepository {
         pstmt.setDate(4, Date.valueOf(order.getDeliveryDate()));
         pstmt.setInt(5, order.getPrice());
         pstmt.execute();
-
-        Statement stmt = connection.createStatement();
-        ResultSet result = stmt.executeQuery("SELECT last_insert_rowid()");
-        if (result.next()) {
-            order.setId(result.getLong(1));
-        }
     }
 
     public void delete(Order order) throws SQLException {
