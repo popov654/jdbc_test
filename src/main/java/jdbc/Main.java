@@ -1,5 +1,6 @@
 package jdbc;
 
+import jdbc.db.ConnectionManager;
 import jdbc.entity.Order;
 import jdbc.repository.OrderRepository;
 import jdbc.repository.exception.RepositoryErrorException;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 public class Main {
 
     public final static String DATA_SOURCE = "jdbc:sqlite:orders.db";
+    private static ConnectionManager connectionManager;
 
     public static void printOrders(List<Order> orders) {
         System.out.println("Orders list:");
@@ -35,10 +37,9 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Connection conn = null;
         try {
-            conn = DriverManager.getConnection(DATA_SOURCE);
-            OrderService service = new OrderService(new OrderRepository(conn));
+            connectionManager = new ConnectionManager(DATA_SOURCE);
+            OrderService service = new OrderService(new OrderRepository(connectionManager.getConnection()));
             service.seedData();
             printOrders(service.getOrders());
 
@@ -66,6 +67,7 @@ public class Main {
             e.printStackTrace();
         } finally {
             try {
+                Connection conn = connectionManager.getConnection();
                 if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
