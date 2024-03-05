@@ -5,7 +5,7 @@ import java.sql.*;
 public class ConnectionManager {
 
     private Connection connection;
-    private String connectionString;
+    private final String connectionString;
 
     public ConnectionManager(String conn) throws SQLException {
         connectionString = conn;
@@ -14,7 +14,8 @@ public class ConnectionManager {
 
     public Connection getConnection() {
         try {
-            if (connection == null || !connection.isValid(1)) {
+            int timeout = 1;
+            if (connection == null || !connection.isValid(timeout)) {
                 connection = DriverManager.getConnection(connectionString);
             }
         } catch (SQLException e) {}
