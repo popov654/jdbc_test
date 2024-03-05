@@ -18,6 +18,7 @@ public class ConnectionManager {
             if (connection == null || !connection.isValid(timeout)) {
                 connection = DriverManager.getConnection(connectionString);
             }
+            connection.setAutoCommit(false);
         } catch (SQLException e) {}
         return connection;
     }

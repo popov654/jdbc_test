@@ -30,61 +30,33 @@ public class OrderService {
                 new Order(5L, "Order 5", "Order description", LocalDate.of(2022, 5, 16),3390),
                 new Order(6L, "Order 6", "Order description", LocalDate.of(2023, 8, 19),1550)
         );
-        try {
-            this.repository.seedData(orders);
-        } catch (SQLException e) {
-            throw new RepositoryAccessException(e);
-        }
+        this.repository.seedData(orders);
     }
 
     public List<Order> getOrders() throws RepositoryAccessException {
-        try {
-            return repository.getAll();
-        } catch (SQLException e) {
-            throw new RepositoryAccessException(e);
-        }
+        return repository.getAll();
     }
 
     public Order getOrder(long id) throws RepositoryAccessException, ResultNotFoundException {
-        try {
-            return repository.get(id);
-        } catch (SQLException e) {
-            throw new RepositoryAccessException(e);
-        }
+        return repository.get(id);
     }
 
     public Order createOrder(String name, String description, LocalDate deliveryDate, int price) throws RepositoryAccessException {
         Order order = new Order(0L, name, description, deliveryDate, price);
-        try {
-            repository.create(order);
-            return order;
-        } catch (SQLException e) {
-            throw new RepositoryAccessException(e);
-        }
+        repository.create(order);
+        return order;
     }
 
     public void updateOrder(Order order) throws RepositoryAccessException {
-        try {
-            repository.update(order);
-        } catch (SQLException e) {
-            throw new RepositoryAccessException(e);
-        }
+        repository.update(order);
     }
 
     public void removeOrder(Order order) throws RepositoryAccessException {
-        try {
-            repository.delete(order);
-        } catch (SQLException e) {
-            throw new RepositoryAccessException(e);
-        }
+        repository.delete(order.getId());
     }
 
     public void removeOrder(long id) throws RepositoryAccessException {
-        try {
-            repository.delete(id);
-        } catch (SQLException e) {
-            throw new RepositoryAccessException(e);
-        }
+        repository.delete(id);
     }
 
 }
