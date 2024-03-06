@@ -19,7 +19,7 @@ public class ConnectionManager {
                 connection = DriverManager.getConnection(connectionString);
             }
             connection.setAutoCommit(false);
-        } catch (SQLException e) {}
+        } catch (SQLException ignored) {}
         return connection;
     }
 }

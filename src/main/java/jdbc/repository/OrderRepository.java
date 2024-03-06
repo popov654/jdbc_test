@@ -77,9 +77,7 @@ public class OrderRepository {
         } catch (Exception e) {
             try {
                 connection.rollback();
-            } catch (SQLException ex) {
-                throw new RepositoryAccessException(ex);
-            }
+            } catch (SQLException ignored) {}
             throw new RepositoryAccessException(e);
         }
     }
@@ -99,9 +97,7 @@ public class OrderRepository {
         } catch (Exception e) {
             try {
                 connection.rollback();
-            } catch (SQLException ex) {
-                throw new RepositoryAccessException(ex);
-            }
+            } catch (SQLException ignored) {}
             throw new RepositoryAccessException(e);
         }
     }
@@ -117,9 +113,7 @@ public class OrderRepository {
         } catch (Exception e) {
             try {
                 connection.rollback();
-            } catch (SQLException ex) {
-                throw new RepositoryAccessException(ex);
-            }
+            } catch (SQLException ignored) {}
             throw new RepositoryAccessException(e);
         }
     }
@@ -154,9 +148,7 @@ public class OrderRepository {
         } catch (Exception e) {
             try {
                 connection.rollback();
-            } catch (SQLException ex) {
-                throw new RepositoryAccessException(ex);
-            }
+            } catch (SQLException ignored) {}
             throw new RepositoryAccessException(e);
         }
     }
