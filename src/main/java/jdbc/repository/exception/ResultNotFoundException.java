@@ -1,6 +1,6 @@
 package jdbc.repository.exception;
 
-public class ResultNotFoundException extends RuntimeException {
+public class ResultNotFoundException extends Exception {
 
     public ResultNotFoundException(String message) {
         super(message);

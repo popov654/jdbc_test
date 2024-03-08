@@ -5,7 +5,6 @@ import jdbc.repository.OrderRepository;
 import jdbc.repository.exception.RepositoryAccessException;
 import jdbc.repository.exception.ResultNotFoundException;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -33,29 +32,61 @@ public class OrderService {
         this.repository.seedData(orders);
     }
 
-    public List<Order> getOrders() throws RepositoryAccessException {
+    /**
+     *
+     * @throws RepositoryAccessException Repository access error caused by error of the underlying DB engine
+     */
+    public List<Order> getOrders() {
         return repository.getAll();
     }
 
-    public Order getOrder(long id) throws RepositoryAccessException, ResultNotFoundException {
+    /**
+     *
+     * @param id Order ID
+     * @throws RepositoryAccessException Repository access error caused by error of the underlying DB engine
+     */
+    public Order getOrder(long id) throws ResultNotFoundException {
         return repository.get(id);
     }
 
+    /**
+     *
+     * @param name Order name
+     * @param description Order description
+     * @param deliveryDate Order delivery date
+     * @param price Order price
+     * @throws RepositoryAccessException Repository access error caused by error of the underlying DB engine
+     */
     public Order createOrder(String name, String description, LocalDate deliveryDate, int price) throws RepositoryAccessException {
         Order order = new Order(0L, name, description, deliveryDate, price);
         repository.create(order);
         return order;
     }
 
-    public void updateOrder(Order order) throws RepositoryAccessException {
+    /**
+     *
+     * @param order Order to update
+     * @throws RepositoryAccessException Repository access error caused by error of the underlying DB engine
+     */
+    public void updateOrder(Order order) {
         repository.update(order);
     }
 
-    public void removeOrder(Order order) throws RepositoryAccessException {
+    /**
+     *
+     * @param order Order to remove
+     * @throws RepositoryAccessException Repository access error caused by error of the underlying DB engine
+     */
+    public void removeOrder(Order order) {
         repository.delete(order.getId());
     }
 
-    public void removeOrder(long id) throws RepositoryAccessException {
+    /**
+     *
+     * @param id Order ID
+     * @throws RepositoryAccessException Repository access error caused by error of the underlying DB engine
+     */
+    public void removeOrder(long id) {
         repository.delete(id);
     }
 
