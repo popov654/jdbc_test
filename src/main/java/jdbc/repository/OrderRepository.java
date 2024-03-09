@@ -10,6 +10,7 @@ import jdbc.repository.exception.ResultNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class OrderRepository {
 
@@ -19,9 +20,9 @@ public class OrderRepository {
         this.connectionManager = connectionManager;
     }
 
-    private Order doOperation(Operation<Order> operation) {
+    private Optional<Order> doOperation(Operation<Optional<Order>> operation) {
         Connection connection = connectionManager.getConnection();
-        Order result = null;
+        Optional<Order> result = Optional.empty();
         try (connection) {
             result = operation.run(connection);
             connection.commit();
@@ -34,7 +35,7 @@ public class OrderRepository {
         return result;
     }
 
-    public List<Order> getAll() throws RepositoryAccessException {
+    public List<Order> getAll() {
         try (Connection connection = connectionManager.getConnection()) {
             List<Order> list = new ArrayList<>();
             Statement stmt = connection.createStatement();
@@ -53,20 +54,20 @@ public class OrderRepository {
         }
     }
 
-    public Order get(long id) throws ResultNotFoundException {
+    public Optional<Order> get(long id) {
         return doOperation(connection -> {
             try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM orders WHERE id=?")) {
                 stmt.setLong(1, id);
                 ResultSet result = stmt.executeQuery();
                 if (result.next()) {
-                    return new Order(result.getLong(1),
+                    return Optional.of(new Order(result.getLong(1),
                             result.getString(2),
                             result.getString(3),
                             result.getDate(4).toLocalDate(),
                             result.getInt(5)
-                    );
+                    ));
                 } else {
-                    throw new ResultNotFoundException(String.format("Order with ID %d not found", id));
+                    return Optional.empty();
                 }
             } catch (Exception e) {
                 throw new RepositoryAccessException(e);
@@ -74,7 +75,7 @@ public class OrderRepository {
         });
     }
 
-    public void create(Order order) throws RepositoryAccessException {
+    public void create(Order order) {
         doOperation(connection -> {
             try (PreparedStatement pstmt = connection.prepareStatement("INSERT INTO orders (`name`, `description`, `delivery_date`, `price`) VALUES(?, ?, ?, ?)");
                  Statement stmt = connection.createStatement()) {
@@ -96,7 +97,7 @@ public class OrderRepository {
         });
     }
 
-    public void update(Order order) throws RepositoryAccessException {
+    public void update(Order order) {
         doOperation(connection -> {
             try (PreparedStatement pstmt = connection.prepareStatement("UPDATE orders SET `name`=?, `description`=?, `delivery_date`=?, `price`=? WHERE id=?");
                  Statement stmt = connection.createStatement()) {
@@ -117,7 +118,7 @@ public class OrderRepository {
         }
     }
 
-    public void delete(long id) throws RepositoryAccessException {
+    public void delete(long id) {
         doOperation(connection -> {
             try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM `orders` WHERE `id`=?")) {
                 pstmt.setLong(1, id);
@@ -129,7 +130,7 @@ public class OrderRepository {
         });
     }
 
-    public void seedData(List<Order> orders) throws RepositoryAccessException {
+    public void seedData(List<Order> orders) {
         doOperation(connection -> {
             Statement stmt = null;
             PreparedStatement pstmt = null;

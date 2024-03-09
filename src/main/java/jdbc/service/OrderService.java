@@ -46,7 +46,7 @@ public class OrderService {
      * @throws RepositoryAccessException Repository access error caused by error of the underlying DB engine
      */
     public Order getOrder(long id) throws ResultNotFoundException {
-        return repository.get(id);
+        return repository.get(id).orElseThrow(() -> new ResultNotFoundException("Order with ID " + id + " not found"));
     }
 
     /**
