@@ -5,7 +5,6 @@ import jdbc.db.ConnectionManager;
 import jdbc.db.Operation;
 import jdbc.entity.Order;
 import jdbc.repository.exception.RepositoryAccessException;
-import jdbc.repository.exception.ResultNotFoundException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -58,19 +57,18 @@ public class OrderRepository {
         return doOperation(connection -> {
             try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM orders WHERE id=?")) {
                 stmt.setLong(1, id);
-                ResultSet result = stmt.executeQuery();
-                if (result.next()) {
-                    return Optional.of(new Order(result.getLong(1),
-                            result.getString(2),
-                            result.getString(3),
-                            result.getDate(4).toLocalDate(),
-                            result.getInt(5)
-                    ));
-                } else {
-                    return Optional.empty();
+                try (ResultSet result = stmt.executeQuery()) {
+                    if (result.next()) {
+                        return Optional.of(new Order(result.getLong(1),
+                                result.getString(2),
+                                result.getString(3),
+                                result.getDate(4).toLocalDate(),
+                                result.getInt(5)
+                        ));
+                    } else {
+                        return Optional.empty();
+                    }
                 }
-            } catch (Exception e) {
-                throw new RepositoryAccessException(e);
             }
         });
     }
@@ -85,22 +83,19 @@ public class OrderRepository {
                 pstmt.setInt(4, order.getPrice());
                 pstmt.execute();
 
-                ResultSet result = stmt.executeQuery("SELECT last_insert_rowid()");
-                if (result.next()) {
-                    order.setId(result.getLong(1));
+                try (ResultSet result = stmt.executeQuery("SELECT last_insert_rowid()")) {
+                    if (result.next()) {
+                        order.setId(result.getLong(1));
+                    }
                 }
-                result.close();
-            } catch (Exception e) {
-                throw new RepositoryAccessException(e);
             }
-            return null;
+            return Optional.empty();
         });
     }
 
     public void update(Order order) {
         doOperation(connection -> {
-            try (PreparedStatement pstmt = connection.prepareStatement("UPDATE orders SET `name`=?, `description`=?, `delivery_date`=?, `price`=? WHERE id=?");
-                 Statement stmt = connection.createStatement()) {
+            try (PreparedStatement pstmt = connection.prepareStatement("UPDATE orders SET `name`=?, `description`=?, `delivery_date`=?, `price`=? WHERE id=?")) {
                 pstmt.setString(1, order.getName());
                 pstmt.setString(2, order.getDescription());
                 pstmt.setDate(3, Date.valueOf(order.getDeliveryDate()));
@@ -108,14 +103,8 @@ public class OrderRepository {
                 pstmt.setLong(5, order.getId());
                 pstmt.execute();
             }
-
-            connection.commit();
-        } catch (Exception e) {
-            try {
-                connection.rollback();
-            } catch (SQLException ignored) {}
-            throw new RepositoryAccessException(e);
-        }
+            return Optional.empty();
+        });
     }
 
     public void delete(long id) {
@@ -123,10 +112,8 @@ public class OrderRepository {
             try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM `orders` WHERE `id`=?")) {
                 pstmt.setLong(1, id);
                 pstmt.execute();
-            } catch (Exception e) {
-                throw new RepositoryAccessException(e);
             }
-            return null;
+            return Optional.empty();
         });
     }
 
@@ -172,7 +159,7 @@ public class OrderRepository {
                 } catch (SQLException ignored) {
                 }
             }
-            return null;
+            return Optional.empty();
         });
     }
 
