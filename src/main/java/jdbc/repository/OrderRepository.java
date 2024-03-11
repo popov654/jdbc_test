@@ -19,9 +19,9 @@ public class OrderRepository {
         this.connectionManager = connectionManager;
     }
 
-    private Optional<Order> doOperation(Operation<Optional<Order>> operation) {
+    private <T> T doOperation(Operation<T> operation) {
         Connection connection = connectionManager.getConnection();
-        Optional<Order> result = Optional.empty();
+        T result;
         try (connection) {
             result = operation.run(connection);
             connection.commit();
@@ -35,7 +35,7 @@ public class OrderRepository {
     }
 
     public List<Order> getAll() {
-        try (Connection connection = connectionManager.getConnection()) {
+        return doOperation(connection -> {
             List<Order> list = new ArrayList<>();
             Statement stmt = connection.createStatement();
             ResultSet result = stmt.executeQuery("SELECT * FROM orders ORDER BY id ASC");
@@ -48,9 +48,7 @@ public class OrderRepository {
                 );
             }
             return list;
-        } catch (Exception e) {
-            throw new RepositoryAccessException(e);
-        }
+        });
     }
 
     public Optional<Order> get(long id) {
